@@ -1,0 +1,36 @@
+{
+  "titleAppBar": "Dicoding Moments",
+
+  "loginTitleAppBar": "Login",
+  "registerTitleAppBar": "Register",
+  "hintTextNameAuth": "Name",
+  "hintTextEmailAuth": "Email",
+  "hintTextPasswordAuth": "Password",
+  "handleEmptyTextNameAuth": "Please enter your name.",
+  "handleEmptyTextEmailAuth": "Please enter your email.",
+  "handleEmptyTextPasswordAuth": "Please enter your password.",
+  "loginTextButton": "LOGIN",
+  "registerTextButton": "REGISTER",
+
+  "storyDaysTimeCreatedText": "days ago",
+  "storyHoursTimeCreatedText": "hours ago",
+  "storyMinutesTimeCreatedText": "minutes ago",
+  "storyNowTimeCreatedText": "Just now",
+
+  "postTitleAppBar": "New Story",
+  "galleryButtonPostTitle": "Gallery",
+  "cameraButtonPostTitle": "Camera",
+  "hintTextDescriptionPost": "Description",
+  "handleEmptyTextDescriptionPost": "Please enter description.",
+  "postButtonText": "Share",
+
+  "appSettingsTitle": "App",
+  "languageSettingsTitle": "Language",
+  "languageTitle": "App Language",
+  "englishLanguageTitle": "English",
+  "englishLanguageSubTitle": "",
+  "indonesianLanguageTitle": "Bahasa Indonesia",
+  "indonesianLanguageSubTitle": "Indonesian",
+  "accountSettingsTitle": "Account",
+  "logoutSettingsTitle": "Log out"
+}

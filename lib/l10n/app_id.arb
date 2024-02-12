@@ -1,0 +1,36 @@
+{
+  "titleAppBar": "Dicoding Moments",
+
+  "loginTitleAppBar": "Masuk",
+  "registerTitleAppBar": "Daftar",
+  "hintTextNameAuth": "Nama",
+  "hintTextEmailAuth": "Email",
+  "hintTextPasswordAuth": "Kata Sandi",
+  "handleEmptyTextNameAuth": "Masukkan nama.",
+  "handleEmptyTextEmailAuth": "Masukkan email.",
+  "handleEmptyTextPasswordAuth": "Masukkan kata sandi.",
+  "loginTextButton": "MASUK",
+  "registerTextButton": "DAFTAR",
+
+  "storyDaysTimeCreatedText": "hari yang lalu",
+  "storyHoursTimeCreatedText": "jam yang lalu",
+  "storyMinutesTimeCreatedText": "menit yang lalu",
+  "storyNowTimeCreatedText": "Baru saja",
+
+  "postTitleAppBar": "Cerita Baru",
+  "galleryButtonPostTitle": "Galeri",
+  "cameraButtonPostTitle": "Kamera",
+  "hintTextDescriptionPost": "Deskripsi",
+  "handleEmptyTextDescriptionPost": "Mohon masukkan deskripsi.",
+  "postButtonText": "Bagikan",
+
+  "appSettingsTitle": "Aplikasi",
+  "languageSettingsTitle": "Bahasa",
+  "languageTitle": "Bahasa Aplikasi",
+  "englishLanguageTitle": "English",
+  "englishLanguageSubTitle": "Bahasa Inggris",
+  "indonesianLanguageTitle": "Bahasa Indonesia",
+  "indonesianLanguageSubTitle": "",
+  "accountSettingsTitle": "Akun",
+  "logoutSettingsTitle": "Keluar"
+}
