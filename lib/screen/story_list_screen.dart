@@ -13,12 +13,12 @@ import 'package:provider/provider.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 
 class StoryListScreen extends StatefulWidget {
-  final Function(String) onTapped;
+  final Function(String) onDetailScreen;
   final ScrollController scrollController;
 
   const StoryListScreen({
     Key? key,
-    required this.onTapped,
+    required this.onDetailScreen,
     required this.scrollController,
   }) : super(key: key);
 
@@ -145,7 +145,7 @@ class _StoryListScreenState extends State<StoryListScreen> {
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: GestureDetector(
-                                  onTap: () => widget.onTapped(story.id),
+                                  onTap: () => widget.onDetailScreen(story.id),
                                   child: CachedNetworkImage(
                                     cacheKey: story.photoUrl,
                                     imageUrl: story.photoUrl,

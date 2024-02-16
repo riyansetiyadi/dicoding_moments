@@ -17,12 +17,14 @@ import 'package:geocoding/geocoding.dart' as geo;
 
 class StoryDetailsScreen extends StatefulWidget {
   final String storyId;
-  final Function(LatLng?) toMapScreen;
+  final Function(LatLng?) onMapScreen;
+  final Function() onBack;
 
   const StoryDetailsScreen({
     Key? key,
     required this.storyId,
-    required this.toMapScreen,
+    required this.onMapScreen,
+    required this.onBack,
   }) : super(key: key);
 
   @override
@@ -69,7 +71,7 @@ class _StoryDetailsScreenState extends State<StoryDetailsScreen> {
                   leading: const Icon(Icons.account_circle),
                   actions: [
                     IconButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => widget.onBack(),
                       icon: const Icon(Icons.close_rounded),
                     )
                   ],
@@ -157,7 +159,7 @@ class _StoryDetailsScreenState extends State<StoryDetailsScreen> {
                                           ),
                                         ),
                                   onTap: () {
-                                    widget.toMapScreen(
+                                    widget.onMapScreen(
                                       LatLng(
                                         story.lat!,
                                         story.lon!,

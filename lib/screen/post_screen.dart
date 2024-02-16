@@ -14,13 +14,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class PostScreen extends StatefulWidget {
-  final Function(LatLng?) toMapScreen;
+  final Function(LatLng?) onMapScreen;
   final Function() onPostSuccess;
+  final Function() onBack;
 
   const PostScreen({
     super.key,
-    required this.toMapScreen,
+    required this.onMapScreen,
     required this.onPostSuccess,
+    required this.onBack,
   });
 
   @override
@@ -54,7 +56,7 @@ class _PostScreenState extends State<PostScreen> {
           ),
         ),
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => widget.onBack(),
           icon: const Icon(
             Icons.arrow_back_rounded,
           ),
@@ -185,7 +187,7 @@ class _PostScreenState extends State<PostScreen> {
               children: [
                 ElevatedButton.icon(
                   onPressed: () async {
-                    widget.toMapScreen(
+                    widget.onMapScreen(
                       locationPick,
                     );
                     String locationDataString =

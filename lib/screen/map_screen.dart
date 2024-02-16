@@ -12,10 +12,12 @@ import 'package:provider/provider.dart';
 class MapScreen extends StatefulWidget {
   final LatLng? currentLocation;
   final bool isFromDetailScreen;
+  final Function() onBack;
   const MapScreen({
     super.key,
     this.currentLocation,
     this.isFromDetailScreen = false,
+    required this.onBack,
   });
 
   @override
@@ -122,7 +124,7 @@ class _MapScreenState extends State<MapScreen> {
                                     context.read<PageManager>().returnData(
                                           pickLocation!.toJson().toString(),
                                         );
-                                    Navigator.pop(context);
+                                    widget.onBack();
                                   } else {
                                     final scaffoldMessenger =
                                         ScaffoldMessenger.of(context);

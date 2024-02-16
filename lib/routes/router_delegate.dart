@@ -201,78 +201,104 @@ class MyRouterDelegate extends RouterDelegate
         MaterialPage(
           key: const ValueKey("StoryListPage"),
           child: StoryListScreen(
-            onTapped: (String storyId) {
+            onDetailScreen: (String storyId) {
               selectedStory = storyId;
               notifyListeners();
             },
             scrollController: scrollControllerStoryList,
           ),
         ),
+        if (currentBottomNavigationIndex == 0) ..._homeStack
+        else if (currentBottomNavigationIndex == 1) ..._postStack
+        else if (currentBottomNavigationIndex == 2) ..._profileStack
+      ];
+
+  List<Page> get _homeStack => [
         if (selectedStory != null)
           MaterialPage(
             key: ValueKey("DetailStoryPage $selectedStory"),
             child: StoryDetailsScreen(
               storyId: selectedStory!,
-              toMapScreen: (newCurrentPickLocation) {
+              onMapScreen: (newCurrentPickLocation) {
                 isMapScreen = true;
                 currentPickLocation = newCurrentPickLocation;
                 notifyListeners();
               },
-            ),
-          ),
-        if (currentBottomNavigationIndex == 1)
-          MaterialPage(
-            key: const ValueKey("PostPage"),
-            child: PostScreen(
-              toMapScreen: (newCurrentPickLocation) {
-                isMapScreen = true;
-                currentPickLocation = newCurrentPickLocation;
-                notifyListeners();
-              },
-              onPostSuccess: () {
-                currentBottomNavigationIndex = 0;
-                final position =
-                    scrollControllerStoryList.position.minScrollExtent - 100;
-                scrollControllerStoryList.animateTo(
-                  position,
-                  curve: Curves.easeInCubic,
-                  duration: const Duration(milliseconds: 300),
-                );
-                notifyListeners();
-              },
-            ),
-          )
-        else if (currentBottomNavigationIndex == 2)
-          MaterialPage(
-            key: const ValueKey("ProfilePage"),
-            child: ProfileScreen(
-              onLogout: () {
-                isLoggedIn = false;
-                currentBottomNavigationIndex = 0;
-                notifyListeners();
-              },
-              onLanguageSettingsScreen: () {
-                isLanguageScreen = true;
+              onBack: () {
+                selectedStory = null;
                 notifyListeners();
               },
             ),
           ),
-        if (isMapScreen && currentBottomNavigationIndex == 1)
-          MaterialPage(
-            key: const ValueKey("MapPage"),
-            child: MapScreen(
-              currentLocation: currentPickLocation,
-            ),
-          )
-        else if (isMapScreen && selectedStory != null)
+        if (isMapScreen)
           MaterialPage(
             key: const ValueKey("MapPage"),
             child: MapScreen(
               currentLocation: currentPickLocation,
               isFromDetailScreen: true,
+              onBack: () {
+                isMapScreen = false;
+                notifyListeners();
+              },
             ),
           )
-        else if (isLanguageScreen)
+      ];
+
+  List<Page> get _postStack => [
+        MaterialPage(
+          key: const ValueKey("PostPage"),
+          child: PostScreen(
+            onMapScreen: (newCurrentPickLocation) {
+              isMapScreen = true;
+              currentPickLocation = newCurrentPickLocation;
+              notifyListeners();
+            },
+            onPostSuccess: () {
+              currentBottomNavigationIndex = 0;
+              final position =
+                  scrollControllerStoryList.position.minScrollExtent - 100;
+              scrollControllerStoryList.animateTo(
+                position,
+                curve: Curves.easeInCubic,
+                duration: const Duration(milliseconds: 300),
+              );
+              notifyListeners();
+            },
+            onBack: () {
+              currentBottomNavigationIndex = 0;
+              notifyListeners();
+            },
+          ),
+        ),
+        if (isMapScreen)
+          MaterialPage(
+            key: const ValueKey("MapPage"),
+            child: MapScreen(
+              currentLocation: currentPickLocation,
+              onBack: () {
+                isMapScreen = false;
+                notifyListeners();
+              },
+            ),
+          )
+      ];
+
+  List<Page> get _profileStack => [
+        MaterialPage(
+          key: const ValueKey("ProfilePage"),
+          child: ProfileScreen(
+            onLogout: () {
+              isLoggedIn = false;
+              currentBottomNavigationIndex = 0;
+              notifyListeners();
+            },
+            onLanguageSettingsScreen: () {
+              isLanguageScreen = true;
+              notifyListeners();
+            },
+          ),
+        ),
+        if (isLanguageScreen)
           const MaterialPage(
             key: ValueKey("LanguageSettingsPage"),
             child: LanguageSettingsScreen(),
