@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dicoding_moments/model/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,7 +18,7 @@ class AuthRepository {
 
   Future<bool> saveProfile(ProfileModel profile) async {
     final preferences = await SharedPreferences.getInstance();
-    return preferences.setString(profileKey, profile.toStringJson());
+    return preferences.setString(profileKey, jsonEncode(profile.toJson()));
   }
 
   Future<bool> deleteProfile() async {
@@ -29,7 +31,7 @@ class AuthRepository {
     final jsonString = preferences.getString(profileKey) ?? "";
     ProfileModel? profile;
     try {
-      profile = ProfileModel.fromStringJson(jsonString);
+      profile = ProfileModel.fromJson(json.decode(jsonString));
     } catch (e) {
       profile = null;
     }

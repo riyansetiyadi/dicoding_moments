@@ -3,20 +3,23 @@ import 'package:dicoding_moments/common.dart';
 import 'package:dicoding_moments/model/story.dart';
 import 'package:dicoding_moments/provider/list_story_provider.dart';
 import 'package:dicoding_moments/utils/datetime_helper.dart';
-import 'package:dicoding_moments/utils/result_state.dart';
+import 'package:dicoding_moments/utils/placemark_helper.dart';
 import 'package:dicoding_moments/widgets/handle_error_refresh_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:geocoding/geocoding.dart' as geo;
 
 class StoryListScreen extends StatefulWidget {
   final Function(String) onTapped;
+  final ScrollController scrollController;
 
   const StoryListScreen({
     Key? key,
     required this.onTapped,
+    required this.scrollController,
   }) : super(key: key);
 
   @override
@@ -25,26 +28,66 @@ class StoryListScreen extends StatefulWidget {
 
 class _StoryListScreenState extends State<StoryListScreen> {
   @override
+  void initState() {
+    super.initState();
+    final listStoryProvider = context.read<ListStoryProvider>();
+
+    widget.scrollController.addListener(() {
+      if (widget.scrollController.position.pixels >=
+          widget.scrollController.position.maxScrollExtent) {
+        if (listStoryProvider.pageItems != null) {
+          listStoryProvider.infiniteScrollState.map(
+            initial: (value) {
+              return listStoryProvider.fetchStory();
+            },
+            loading: (value) {
+              return;
+            },
+            loaded: (value) {
+              return listStoryProvider.fetchStory();
+            },
+            error: (value) {
+              return;
+            },
+          );
+        }
+      }
+    });
+
+    Future.microtask(() async => listStoryProvider.fetchStory());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Consumer<ListStoryProvider>(
           builder: (context, state, _) {
-            if (state.state == ResultState.loading) {
-              return Center(
-                child: defaultTargetPlatform == TargetPlatform.iOS
-                    ? const CupertinoActivityIndicator(
-                        radius: 20.0,
-                      )
-                    : const CircularProgressIndicator(),
-              );
-            } else if (state.state == ResultState.hasData) {
-              List<StoryModel> stories = state.storyList;
-              return RefreshIndicator(
-                onRefresh: () async {
-                  await state.refreshStories();
-                },
-                child: CustomScrollView(
+            return state.state.map(
+              initial: (value) {
+                return ErrorRefresh(
+                  errorTitle: state.message,
+                  refreshTitle: 'Refresh',
+                  onPressed: () async {
+                    await state.refreshStories();
+                  },
+                );
+              },
+              loading: (value) {
+                return Center(
+                  child: defaultTargetPlatform == TargetPlatform.iOS
+                      ? const CupertinoActivityIndicator(
+                          radius: 20.0,
+                        )
+                      : const CircularProgressIndicator(),
+                );
+              },
+              loaded: (value) {
+                List<StoryModel> stories = value.data;
+                return CustomScrollView(
+                  controller: widget.scrollController,
+                  physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics()),
                   slivers: <Widget>[
                     SliverAppBar(
                       title: Text(
@@ -54,29 +97,51 @@ class _StoryListScreenState extends State<StoryListScreen> {
                       floating: true,
                       snap: true,
                     ),
+                    CupertinoSliverRefreshControl(
+                      onRefresh: () async {
+                        await state.refreshStories();
+                      },
+                    ),
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (BuildContext context, int index) {
+                          if (index == stories.length &&
+                              state.pageItems != null) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(8),
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          }
+
                           StoryModel story = stories[index];
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(
-                                      Icons.account_circle,
-                                    ),
-                                  ),
-                                  Text(
-                                    story.name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              (story.lat != null && story.lon != null)
+                                  ? FutureBuilder(
+                                      future: geo.placemarkFromCoordinates(
+                                        story.lat!,
+                                        story.lon!,
+                                      ),
+                                      builder: (context, snapshot) {
+                                        geo.Placemark? placemark =
+                                            snapshot.data?[0];
+                                        String? loc = PlacemarkHelper()
+                                            .getLocation(placemark);
+                                        if (loc == null) {
+                                          return headingPostWithoutSubtitle(
+                                            story,
+                                          );
+                                        } else {
+                                          return headingPostWithSubtitle(
+                                            story,
+                                            loc,
+                                          );
+                                        }
+                                      })
+                                  : headingPostWithoutSubtitle(story),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: GestureDetector(
@@ -141,40 +206,70 @@ class _StoryListScreenState extends State<StoryListScreen> {
                             ],
                           );
                         },
-                        childCount: stories.length,
+                        childCount:
+                            stories.length + (state.pageItems != null ? 1 : 0),
                       ),
                     ),
                   ],
-                ),
-              );
-            } else if (state.state == ResultState.noData) {
-              return ErrorRefresh(
-                errorTitle: state.message,
-                refreshTitle: 'Refresh',
-                onPressed: () async {
-                  await state.refreshStories();
-                },
-              );
-            } else if (state.state == ResultState.error) {
-              return ErrorRefresh(
-                errorTitle: state.message,
-                refreshTitle: 'Refresh',
-                onPressed: () async {
-                  await state.refreshStories();
-                },
-              );
-            } else {
-              return ErrorRefresh(
-                errorTitle: state.message,
-                refreshTitle: 'Refresh',
-                onPressed: () async {
-                  await state.refreshStories();
-                },
-              );
-            }
+                );
+              },
+              error: (value) {
+                return ErrorRefresh(
+                  errorTitle: value.message,
+                  refreshTitle: 'Refresh',
+                  onPressed: () async {
+                    await state.refreshStories();
+                  },
+                );
+              },
+            );
           },
         ),
       ),
+    );
+  }
+
+  ListTile headingPostWithoutSubtitle(StoryModel story) {
+    return ListTile(
+      leading: IconButton(
+        onPressed: () {},
+        icon: const Icon(
+          Icons.account_circle,
+        ),
+      ),
+      title: Text(
+        story.name,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      contentPadding: EdgeInsets.zero,
+      horizontalTitleGap: 0,
+    );
+  }
+
+  ListTile headingPostWithSubtitle(StoryModel story, String subtitleText) {
+    return ListTile(
+      leading: IconButton(
+        onPressed: () {},
+        icon: const Icon(
+          Icons.account_circle,
+        ),
+      ),
+      title: Text(
+        story.name,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      subtitle: Text(
+        subtitleText,
+        style: const TextStyle(
+          fontSize: 12,
+        ),
+      ),
+      contentPadding: EdgeInsets.zero,
+      horizontalTitleGap: 0,
     );
   }
 }

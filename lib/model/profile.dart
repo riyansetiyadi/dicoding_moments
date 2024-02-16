@@ -1,30 +1,17 @@
-import 'dart:convert';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class ProfileModel {
-  final String userId;
-  final String name;
-  final String token;
+part 'profile.g.dart';
 
-  ProfileModel({
-    required this.userId,
-    required this.name,
-    required this.token,
-  });
+part 'profile.freezed.dart';
 
-  factory ProfileModel.fromJson(Map<String, dynamic> json) => ProfileModel(
-        userId: json["userId"],
-        name: json["name"],
-        token: json["token"],
-      );
+@freezed
 
-  factory ProfileModel.fromStringJson(String jsonString) =>
-      ProfileModel.fromJson(json.decode(jsonString));
+class ProfileModel with _$ProfileModel {
+  const factory ProfileModel({
+    required String name,
+    required String userId,
+    required String token,
+  }) = _ProfileModel;
 
-  Map<String, dynamic> toJson() => {
-        "userId": userId,
-        "name": name,
-        "token": token,
-      };
-
-  String toStringJson() => json.encode(toJson());
+  factory ProfileModel.fromJson(Map<String, dynamic> json) => _$ProfileModelFromJson(json);
 }

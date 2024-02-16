@@ -71,30 +71,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 13.0),
-                        child: authWatch.isLoadingLogout
-                            ? const CircularProgressIndicator(
-                                color: Colors.black,
-                              )
-                            : ListTile(
-                                leading: const Icon(
-                                  Icons.language,
-                                ),
-                                contentPadding: const EdgeInsets.all(0),
-                                title: Text(
-                                  AppLocalizations.of(context)
-                                          ?.languageSettingsTitle ??
-                                      "Language",
-                                  textAlign: TextAlign.start,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                trailing: const Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                ),
-                              ),
+                        child: ListTile(
+                          leading: const Icon(
+                            Icons.language,
+                          ),
+                          contentPadding: const EdgeInsets.all(0),
+                          title: Text(
+                            AppLocalizations.of(context)
+                                    ?.languageSettingsTitle ??
+                                "Language",
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          trailing: const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                          ),
+                        ),
                       ),
                     ),
                   ],

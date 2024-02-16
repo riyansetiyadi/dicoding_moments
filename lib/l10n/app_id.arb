@@ -12,6 +12,8 @@
   "loginTextButton": "MASUK",
   "registerTextButton": "DAFTAR",
 
+  "storyYearsTimeCreatedText": "tahun yang lalu",
+  "storyMonthTimeCreatedText": "bulan yang lalu",
   "storyDaysTimeCreatedText": "hari yang lalu",
   "storyHoursTimeCreatedText": "jam yang lalu",
   "storyMinutesTimeCreatedText": "menit yang lalu",
@@ -20,9 +22,13 @@
   "postTitleAppBar": "Cerita Baru",
   "galleryButtonPostTitle": "Galeri",
   "cameraButtonPostTitle": "Kamera",
+  "locationButtonPostTitle": "Tambah Lokasi",
   "hintTextDescriptionPost": "Deskripsi",
   "handleEmptyTextDescriptionPost": "Mohon masukkan deskripsi.",
   "postButtonText": "Bagikan",
+
+  "mapFromPostTitle": "Tambah Lokasi",
+  "handleEmptyPickLocation": "Silakan tekan lama untuk memilih lokasi atau gunakan tombol kembali.",
 
   "appSettingsTitle": "Aplikasi",
   "languageSettingsTitle": "Bahasa",

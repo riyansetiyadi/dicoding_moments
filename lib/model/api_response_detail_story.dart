@@ -1,26 +1,19 @@
 import 'package:dicoding_moments/model/story.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class ApiResponseGetDetailStoryModel {
-  final bool error;
-  final String message;
-  final StoryModel story;
+part 'api_response_detail_story.g.dart';
 
-  ApiResponseGetDetailStoryModel({
-    required this.error,
-    required this.message,
-    required this.story,
-  });
+part 'api_response_detail_story.freezed.dart';
+
+@freezed
+
+class ApiResponseGetDetailStoryModel with _$ApiResponseGetDetailStoryModel {
+  const factory ApiResponseGetDetailStoryModel({
+    required bool error,
+    required String message,
+    required StoryModel story,
+  }) = _ApiResponseGetDetailStoryModel;
 
   factory ApiResponseGetDetailStoryModel.fromJson(Map<String, dynamic> json) =>
-      ApiResponseGetDetailStoryModel(
-        error: json["error"],
-        message: json["message"],
-        story: StoryModel.fromJson(json["story"]),
-      );
-
-  Map<String, dynamic> toJson() => {
-        "error": error,
-        "message": message,
-        "story": story.toJson(),
-      };
+      _$ApiResponseGetDetailStoryModelFromJson(json);
 }

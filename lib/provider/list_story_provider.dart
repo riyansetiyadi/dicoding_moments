@@ -3,71 +3,132 @@ import 'dart:async';
 import 'package:dicoding_moments/api/api_service.dart';
 import 'package:dicoding_moments/db/auth_repository.dart';
 import 'package:dicoding_moments/model/api_response_get_all_story.dart';
+import 'package:dicoding_moments/model/loading_state.dart';
 import 'package:dicoding_moments/model/story.dart';
-import 'package:dicoding_moments/utils/result_state.dart';
 import 'package:flutter/material.dart';
 
 class ListStoryProvider extends ChangeNotifier {
   final AuthRepository authRepository;
   final ApiService apiService;
 
-  ListStoryProvider({required this.authRepository, required this.apiService}) {
-    _fetchAllStory();
-  }
+  ListStoryProvider({required this.authRepository, required this.apiService});
 
   String _message = '';
   String get message => _message;
 
-  late List<StoryModel> _storyListResult;
+  List<StoryModel> _storyListResult = [];
   List<StoryModel> get storyList => _storyListResult;
 
-  late ResultState _state;
-  ResultState get state => _state;
+  LoadingState _state = const LoadingState.initial();
+  LoadingState get state => _state;
+
+  LoadingState _infiniteScrollState = const LoadingState.initial();
+  LoadingState get infiniteScrollState => _infiniteScrollState;
+
+  int? pageItems = 1;
+  int sizeItems = 10;
 
   Future<bool> refreshStories() async {
-    return _fetchAllStory();
-  }
-
-  Future<bool> _fetchAllStory() async {
     try {
-      _state = ResultState.loading;
-      notifyListeners();
       final profileState = await authRepository.getProfile();
       if (profileState != null) {
         String token = profileState.token;
-        ApiResponseGetAllStoryModel result =
-            await apiService.getAllStory(token);
+        ApiResponseGetAllStoryModel result = await apiService.getAllStory(
+          token,
+          page: 1,
+          size: sizeItems,
+        );
         if (result.error) {
-          _state = ResultState.error;
           _message = result.message;
-          _storyListResult = [];
           notifyListeners();
           return false;
         } else {
           if (result.listStory.isEmpty) {
-            _state = ResultState.noData;
             _message = 'Empty Data';
-            _storyListResult = [];
             notifyListeners();
             return false;
           } else {
-            _state = ResultState.hasData;
             _message = result.message;
             _storyListResult = result.listStory;
+            _state = LoadingState.loaded(_storyListResult);
+            pageItems = 2;
             notifyListeners();
             return true;
           }
         }
       } else {
-        _state = ResultState.error;
         _message = "Login for story";
-        _storyListResult = [];
         notifyListeners();
         return false;
       }
     } catch (e) {
-      _state = ResultState.error;
       _message = 'Error --> $e';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> fetchStory() async {
+    try {
+      if (pageItems == 1) {
+        _state = const LoadingState.loading();
+      } else {
+        _infiniteScrollState = const LoadingState.loading();
+      }
+      notifyListeners();
+
+      final profileState = await authRepository.getProfile();
+
+      if (profileState != null) {
+        String token = profileState.token;
+        ApiResponseGetAllStoryModel result = await apiService.getAllStory(
+          token,
+          page: pageItems,
+          size: sizeItems,
+        );
+        if (result.error) {
+          _message = result.message;
+          if (pageItems == 1) {
+            _state = LoadingState.error(_message);
+          } else {
+            _infiniteScrollState = LoadingState.error(_message);
+          }
+          notifyListeners();
+          return false;
+        } else {
+          _message = result.message;
+          _storyListResult.addAll(result.listStory);
+          if (pageItems == 1) {
+            _state = LoadingState.loaded(_storyListResult);
+          } else {
+            _infiniteScrollState = LoadingState.loaded(_storyListResult);
+          }
+
+          if (result.listStory.length < sizeItems) {
+            pageItems = null;
+          } else {
+            pageItems = pageItems! + 1;
+          }
+          notifyListeners();
+          return true;
+        }
+      } else {
+        _message = "Login for story";
+        if (pageItems == 1) {
+          _state = LoadingState.error(_message);
+        } else {
+          _infiniteScrollState = LoadingState.error(_message);
+        }
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _message = 'Error --> $e';
+      if (pageItems == 1) {
+        _state = LoadingState.error(_message);
+      } else {
+        _infiniteScrollState = LoadingState.error(_message);
+      }
       notifyListeners();
       return false;
     }

@@ -1,10 +1,12 @@
 import 'package:dicoding_moments/screen/language_settings_screen.dart';
+import 'package:dicoding_moments/screen/map_screen.dart';
 import 'package:dicoding_moments/screen/post_screen.dart';
 import 'package:dicoding_moments/screen/profile_screen.dart';
 import 'package:dicoding_moments/screen/story_detail_screen.dart';
 import 'package:dicoding_moments/screen/story_list_screen.dart';
 import 'package:dicoding_moments/screen/register_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../db/auth_repository.dart';
 import '../screen/login_screen.dart';
@@ -19,6 +21,14 @@ class MyRouterDelegate extends RouterDelegate
     this.authRepository,
   ) : _navigatorKey = GlobalKey<NavigatorState>() {
     _init();
+  }
+
+  final ScrollController scrollControllerStoryList = ScrollController();
+
+  @override
+  void dispose() {
+    scrollControllerStoryList.dispose();
+    super.dispose();
   }
 
   _init() async {
@@ -40,6 +50,8 @@ class MyRouterDelegate extends RouterDelegate
   bool isRegister = false;
   int currentBottomNavigationIndex = 0;
   bool isLanguageScreen = false;
+  bool isMapScreen = false;
+  LatLng? currentPickLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -61,9 +73,31 @@ class MyRouterDelegate extends RouterDelegate
             return false;
           }
 
-          if (currentBottomNavigationIndex == 2 && isLanguageScreen) {
-            isLanguageScreen = false;
-            return true;
+          if (currentBottomNavigationIndex == 0) {
+            if (selectedStory != null) {
+              if (isMapScreen) {
+                isMapScreen = false;
+                notifyListeners();
+                return true;
+              }
+
+              selectedStory = null;
+              notifyListeners();
+              return true;
+            }
+          } else if (currentBottomNavigationIndex == 1) {
+            if (isMapScreen) {
+              isMapScreen = false;
+              currentPickLocation = null;
+              notifyListeners();
+              return true;
+            }
+          } else if (currentBottomNavigationIndex == 2) {
+            if (isLanguageScreen) {
+              isLanguageScreen = false;
+              notifyListeners();
+              return true;
+            }
           }
 
           isRegister = false;
@@ -82,6 +116,18 @@ class MyRouterDelegate extends RouterDelegate
               currentIndex: currentBottomNavigationIndex,
               onTap: (index) {
                 if (index == 0) {
+                  if (currentBottomNavigationIndex == index) {
+                    if (scrollControllerStoryList.hasClients) {
+                      final position =
+                          scrollControllerStoryList.position.minScrollExtent -
+                              100;
+                      scrollControllerStoryList.animateTo(
+                        position,
+                        curve: Curves.easeInCubic,
+                        duration: const Duration(milliseconds: 300),
+                      );
+                    }
+                  }
                   currentBottomNavigationIndex = 0;
                 } else if (index == 1) {
                   currentBottomNavigationIndex = 1;
@@ -159,6 +205,7 @@ class MyRouterDelegate extends RouterDelegate
               selectedStory = storyId;
               notifyListeners();
             },
+            scrollController: scrollControllerStoryList,
           ),
         ),
         if (selectedStory != null)
@@ -166,12 +213,34 @@ class MyRouterDelegate extends RouterDelegate
             key: ValueKey("DetailStoryPage $selectedStory"),
             child: StoryDetailsScreen(
               storyId: selectedStory!,
+              toMapScreen: (newCurrentPickLocation) {
+                isMapScreen = true;
+                currentPickLocation = newCurrentPickLocation;
+                notifyListeners();
+              },
             ),
           ),
         if (currentBottomNavigationIndex == 1)
-          const MaterialPage(
-            key: ValueKey("PostPage"),
-            child: PostScreen(),
+          MaterialPage(
+            key: const ValueKey("PostPage"),
+            child: PostScreen(
+              toMapScreen: (newCurrentPickLocation) {
+                isMapScreen = true;
+                currentPickLocation = newCurrentPickLocation;
+                notifyListeners();
+              },
+              onPostSuccess: () {
+                currentBottomNavigationIndex = 0;
+                final position =
+                    scrollControllerStoryList.position.minScrollExtent - 100;
+                scrollControllerStoryList.animateTo(
+                  position,
+                  curve: Curves.easeInCubic,
+                  duration: const Duration(milliseconds: 300),
+                );
+                notifyListeners();
+              },
+            ),
           )
         else if (currentBottomNavigationIndex == 2)
           MaterialPage(
@@ -188,7 +257,22 @@ class MyRouterDelegate extends RouterDelegate
               },
             ),
           ),
-        if (currentBottomNavigationIndex == 2 && isLanguageScreen)
+        if (isMapScreen && currentBottomNavigationIndex == 1)
+          MaterialPage(
+            key: const ValueKey("MapPage"),
+            child: MapScreen(
+              currentLocation: currentPickLocation,
+            ),
+          )
+        else if (isMapScreen && selectedStory != null)
+          MaterialPage(
+            key: const ValueKey("MapPage"),
+            child: MapScreen(
+              currentLocation: currentPickLocation,
+              isFromDetailScreen: true,
+            ),
+          )
+        else if (isLanguageScreen)
           const MaterialPage(
             key: ValueKey("LanguageSettingsPage"),
             child: LanguageSettingsScreen(),

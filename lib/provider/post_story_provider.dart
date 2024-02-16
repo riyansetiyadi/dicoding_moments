@@ -1,8 +1,8 @@
 import 'package:dicoding_moments/api/api_service.dart';
 import 'package:dicoding_moments/db/auth_repository.dart';
 import 'package:dicoding_moments/model/api_response_add_story.dart';
+import 'package:dicoding_moments/model/loading_state.dart';
 import 'package:dicoding_moments/model/post_story.dart';
-import 'package:dicoding_moments/utils/result_state.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart' show XFile;
 import 'package:image/image.dart' as img;
@@ -16,8 +16,8 @@ class PostStoryProvider extends ChangeNotifier {
   String _message = "";
   String get message => _message;
 
-  ResultState _state = ResultState.init;
-  ResultState get state => _state;
+  LoadingState _state = const LoadingState.initial();
+  LoadingState get state => _state;
 
   ApiResponseAddStoryModel? _result;
   ApiResponseAddStoryModel? get result => _result;
@@ -40,44 +40,42 @@ class PostStoryProvider extends ChangeNotifier {
     PostStoryModel postStory,
   ) async {
     try {
-      _state = ResultState.loading;
+      _state = const LoadingState.loading();
       notifyListeners();
 
       final profileState = await authRepository.getProfile();
 
-      final fileName = postStory.imageFile.name;
       final bytes = await postStory.imageFile.readAsBytes();
-      final newBytes = await compressImage(bytes);
+      
+      postStory = postStory.copyWith.call(bytes: bytes);
       if (profileState != null) {
         String token = profileState.token;
         _result = await apiService.addStoryApi(
           token,
-          newBytes,
-          fileName,
-          postStory.description,
-        );
+          postStory,
+          );
         if (_result?.error ?? false) {
-          _state = ResultState.error;
           _message = _result?.message ?? "error";
+          _state = LoadingState.error(_message);
           notifyListeners();
           return false;
         } else {
           _message = _result?.message ?? "success";
-          _state = ResultState.hasData;
+          _state = LoadingState.loaded(_message);
           imageFile = null;
           imagePath = null;
           notifyListeners();
           return true;
         }
       } else {
-        _state = ResultState.error;
         _message = "Login for post story";
+        _state = LoadingState.error(_message);
         notifyListeners();
         return false;
       }
     } catch (e) {
-      _state = ResultState.error;
       _message = e.toString();
+      _state = LoadingState.error(_message);
       notifyListeners();
       return false;
     }

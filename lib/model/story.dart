@@ -1,41 +1,22 @@
-class StoryModel {
-  final String id;
-  final String name;
-  final String description;
-  final String photoUrl;
-  final DateTime? createdAt;
-  final double? lat;
-  final double? lon;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  StoryModel({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.photoUrl,
-    this.createdAt,
-    this.lat,
-    this.lon,
-  });
+part 'story.g.dart';
 
-  factory StoryModel.fromJson(Map<String, dynamic> json) => StoryModel(
-        id: json["id"],
-        name: json["name"],
-        description: json["description"],
-        photoUrl: json["photoUrl"],
-        createdAt: json.containsKey('createdAt')
-            ? DateTime.parse(json["createdAt"])
-            : null,
-        lat: json["lat"]?.toDouble(),
-        lon: json["lon"]?.toDouble(),
-      );
+part 'story.freezed.dart';
 
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "description": description,
-        "photoUrl": photoUrl,
-        "createdAt": createdAt?.toIso8601String(),
-        "lat": lat,
-        "lon": lon,
-      };
+@freezed
+
+class StoryModel with _$StoryModel {
+  const factory StoryModel({
+    required String id,
+    required String name,
+    required String description,
+    required String photoUrl,
+    DateTime? createdAt,
+    double? lat,
+    double? lon,
+  }) = _StoryModel;
+
+  factory StoryModel.fromJson(Map<String, dynamic> json) =>
+      _$StoryModelFromJson(json);
 }

@@ -47,6 +47,12 @@ dependencies:
   readmore: ^2.2.0
   image_picker: ^1.0.7
   image: ^4.1.7
+  google_maps_flutter_web: ^0.5.4+3
+  google_maps_flutter: ^2.5.3
+  location: ^5.0.3
+  geocoding: ^2.1.1
+  json_annotation: ^4.8.1
+  freezed_annotation: ^2.4.1
 
 dev_dependencies:
   flutter_test:
@@ -58,6 +64,9 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  build_runner: ^2.4.8
+  json_serializable: ^6.7.1
+  freezed: ^2.4.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:dicoding_moments/api/api_service.dart';
 import 'package:dicoding_moments/db/auth_repository.dart';
 import 'package:dicoding_moments/model/api_response_detail_story.dart';
+import 'package:dicoding_moments/model/loading_state.dart';
 import 'package:dicoding_moments/model/story.dart';
-import 'package:dicoding_moments/utils/result_state.dart';
 import 'package:flutter/material.dart';
 
 class DetailStoryProvider extends ChangeNotifier {
@@ -26,8 +26,8 @@ class DetailStoryProvider extends ChangeNotifier {
   StoryModel? _storyResult;
   StoryModel? get story => _storyResult;
 
-  ResultState _state = ResultState.init;
-  ResultState get state => _state;
+  LoadingState _state = const LoadingState.initial();
+  LoadingState get state => _state;
 
   Future<bool> refreshStory() async {
     return _fetchDetailStory(_storyResult?.id ?? '');
@@ -35,7 +35,7 @@ class DetailStoryProvider extends ChangeNotifier {
 
   Future<bool> _fetchDetailStory(String idStory) async {
     try {
-      _state = ResultState.loading;
+      _state = const LoadingState.loading();
       notifyListeners();
       final profileState = await authRepository.getProfile();
       if (profileState != null) {
@@ -43,28 +43,28 @@ class DetailStoryProvider extends ChangeNotifier {
         ApiResponseGetDetailStoryModel result =
             await apiService.getDetailStory(token, idStory);
         if (result.error) {
-          _state = ResultState.error;
           _message = result.message;
           _storyResult = null;
+          _state = LoadingState.error(_message);
           notifyListeners();
           return false;
         } else {
-          _state = ResultState.hasData;
           _message = result.message;
           _storyResult = result.story;
+          _state = LoadingState.loaded(_storyResult);
           notifyListeners();
           return true;
         }
       } else {
-        _state = ResultState.error;
         _message = "Login for story";
         _storyResult = null;
+        _state = LoadingState.error(_message);
         notifyListeners();
         return false;
       }
     } catch (e) {
-      _state = ResultState.error;
       _message = 'Error --> $e';
+      _state = LoadingState.error(_message);
       notifyListeners();
       return false;
     }

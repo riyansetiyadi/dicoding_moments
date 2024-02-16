@@ -1,28 +1,19 @@
 import 'package:dicoding_moments/model/profile.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class ApiResponseLoginModel {
-  final bool error;
-  final String message;
-  final ProfileModel? loginResult;
+part 'api_response_login.g.dart';
 
-  ApiResponseLoginModel({
-    required this.error,
-    required this.message,
-    this.loginResult,
-  });
+part 'api_response_login.freezed.dart';
+
+@freezed
+
+class ApiResponseLoginModel with _$ApiResponseLoginModel {
+  const factory ApiResponseLoginModel({
+    required bool error,
+    required String message,
+    ProfileModel? loginResult,
+  }) = _ApiResponseLoginModel;
 
   factory ApiResponseLoginModel.fromJson(Map<String, dynamic> json) =>
-      ApiResponseLoginModel(
-        error: json["error"],
-        message: json["message"],
-        loginResult: json.containsKey("loginResult")
-            ? ProfileModel.fromJson(json["loginResult"])
-            : null,
-      );
-
-  Map<String, dynamic> toJson() => {
-        "error": error,
-        "message": message,
-        "loginResult": loginResult?.toJson(),
-      };
+      _$ApiResponseLoginModelFromJson(json);
 }

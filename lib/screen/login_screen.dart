@@ -1,6 +1,7 @@
 import 'package:dicoding_moments/common.dart';
 import 'package:dicoding_moments/model/user.dart';
 import 'package:dicoding_moments/provider/auth_provider.dart';
+import 'package:dicoding_moments/provider/list_story_provider.dart';
 import 'package:dicoding_moments/routes/page_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -112,6 +113,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             final result = await authRead.login(user);
                             if (result) {
+                              if (context.mounted) {
+                                await Provider.of<ListStoryProvider>(context, listen: false)
+                                    .fetchStory();
+                              }
                               widget.onLogin();
                             } else {
                               scaffoldMessenger.showSnackBar(

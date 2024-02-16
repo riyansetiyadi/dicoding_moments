@@ -12,6 +12,8 @@
   "loginTextButton": "LOGIN",
   "registerTextButton": "REGISTER",
 
+  "storyYearsTimeCreatedText": "years ago",
+  "storyMonthTimeCreatedText": "months ago",
   "storyDaysTimeCreatedText": "days ago",
   "storyHoursTimeCreatedText": "hours ago",
   "storyMinutesTimeCreatedText": "minutes ago",
@@ -20,9 +22,13 @@
   "postTitleAppBar": "New Story",
   "galleryButtonPostTitle": "Gallery",
   "cameraButtonPostTitle": "Camera",
+  "locationButtonPostTitle": "Add Location",
   "hintTextDescriptionPost": "Description",
   "handleEmptyTextDescriptionPost": "Please enter description.",
   "postButtonText": "Share",
+
+  "mapFromPostTitle": "Add Location",
+  "handleEmptyPickLocation": "Please long-press to select a location or use the back button.",
 
   "appSettingsTitle": "App",
   "languageSettingsTitle": "Language",

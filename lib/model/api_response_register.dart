@@ -1,20 +1,17 @@
-class ApiResponseRegisterModel {
-  final bool error;
-  final String? message;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  ApiResponseRegisterModel({
-    required this.error,
-    this.message,
-  });
+part 'api_response_register.g.dart';
+
+part 'api_response_register.freezed.dart';
+
+@freezed
+
+class ApiResponseRegisterModel with _$ApiResponseRegisterModel {
+  const factory ApiResponseRegisterModel({
+    required bool error,
+    String? message,
+  }) = _ApiResponseRegisterModel;
 
   factory ApiResponseRegisterModel.fromJson(Map<String, dynamic> json) =>
-      ApiResponseRegisterModel(
-        error: json["error"],
-        message: json.containsKey('message') ? json["message"] : null,
-      );
-
-  Map<String, dynamic> toJson() => {
-        "error": error,
-        "message": message,
-      };
+      _$ApiResponseRegisterModelFromJson(json);
 }

@@ -5,6 +5,7 @@ import 'package:dicoding_moments/model/api_response_detail_story.dart';
 import 'package:dicoding_moments/model/api_response_get_all_story.dart';
 import 'package:dicoding_moments/model/api_response_login.dart';
 import 'package:dicoding_moments/model/api_response_register.dart';
+import 'package:dicoding_moments/model/post_story.dart';
 import 'package:dicoding_moments/model/user.dart';
 import 'package:http/http.dart' as http;
 
@@ -15,7 +16,7 @@ class ApiService {
     final response = await http.post(
       Uri.parse("$_baseUrl/register"),
       headers: {'Content-Type': 'application/json'},
-      body: user.toStringJson(),
+      body: jsonEncode(user.toJson()),
     );
     if (response.statusCode == 201 || response.statusCode == 400) {
       final apiResponse =
@@ -27,10 +28,12 @@ class ApiService {
   }
 
   Future<ApiResponseLoginModel> loginApi(User user) async {
+    Map userJson = user.toJson();
+    userJson.remove("name");
     final response = await http.post(
       Uri.parse("$_baseUrl/login"),
       headers: {'Content-Type': 'application/json'},
-      body: user.toStringJson(),
+      body: jsonEncode(userJson),
     );
     if (response.statusCode == 200 ||
         response.statusCode == 401 ||
@@ -45,9 +48,7 @@ class ApiService {
 
   Future<ApiResponseAddStoryModel> addStoryApi(
     String token,
-    List<int> bytes,
-    String fileName,
-    String description,
+    PostStoryModel story,
   ) async {
     var request = http.MultipartRequest(
       'POST',
@@ -56,11 +57,13 @@ class ApiService {
 
     final multiPartFile = http.MultipartFile.fromBytes(
       "photo",
-      bytes,
-      filename: fileName,
+      story.bytes ?? [],
+      filename: story.imageFile.name,
     );
     final Map<String, String> fields = {
-      "description": description,
+      "description": story.description,
+      if (story.lat != null) "lat": story.lat.toString(),
+      if (story.lon != null) "lon": story.lon.toString(),
     };
     final Map<String, String> headers = {
       "Content-type": "multipart/form-data",
@@ -107,6 +110,7 @@ class ApiService {
         'Authorization': 'Bearer $token',
       },
     );
+
     if (response.statusCode == 200) {
       final apiResponse =
           ApiResponseGetAllStoryModel.fromJson(json.decode(response.body));
