@@ -1,5 +1,6 @@
 import 'package:dicoding_moments/common.dart';
 import 'package:dicoding_moments/routes/page_manager.dart';
+import 'package:dicoding_moments/utils/placemark_helper.dart';
 import 'package:dicoding_moments/widgets/place_mark_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -44,7 +45,7 @@ class _MapScreenState extends State<MapScreen> {
       appBar: AppBar(
         title: Text(
           widget.isFromDetailScreen
-              ? placemark?.locality ?? "Google Maps"
+              ? PlacemarkHelper().getLocation(placemark) ?? "Google Maps"
               : AppLocalizations.of(context)?.mapFromPostTitle ?? "Google Maps",
         ),
       ),
