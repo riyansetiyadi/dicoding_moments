@@ -21,10 +21,6 @@ Menjalankan project
 ```bash
 flutter run
 ```
-Link APK
-
-
-[Aplikasi](https://drive.google.com/drive/folders/1Ak3KQOIQ9Vg4B1r9dA6YMl3yWdnaJtkk)
 
 ## Preview
 
