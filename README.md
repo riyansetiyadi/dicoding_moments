@@ -2,6 +2,11 @@
 
 Dicoding Moments merupakan aplikasi mobile yang digunakan untuk membagikan kegiatan selama belajar di Dicoding. Pengguna dapat membagikan postingan beserta gambar dan lokasi. Pengguna harus masuk atau mendaftar dengan email sebelum memposting. Selain itu terdapat fitur mengubah bahasa pada aplikasi. Aplikasi ini dibuat dengan flutter dan google maps serta API dari Dicoding.
 
+## Application build with
+- Flutter 3.16.9
+- Dart SDK 3.2.6
+- Android SDK 31.0.0
+
 ## Installation
 
 Clone project
