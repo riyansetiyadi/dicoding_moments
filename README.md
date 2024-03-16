@@ -27,6 +27,6 @@ flutter run
 <img src="preview.gif" width="1920" height="1920" alt="Preview">
 
 # To Do
-- save localization in shared preferences
+- save localization language app in shared preferences (done)
 - dark theme
 - clean architecture

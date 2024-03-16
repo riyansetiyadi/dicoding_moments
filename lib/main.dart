@@ -1,5 +1,6 @@
 import 'package:dicoding_moments/api/api_service.dart';
 import 'package:dicoding_moments/db/auth_repository.dart';
+import 'package:dicoding_moments/db/preference_settings.dart';
 import 'package:dicoding_moments/provider/auth_provider.dart';
 import 'package:dicoding_moments/provider/detail_story_provider.dart';
 import 'package:dicoding_moments/provider/list_story_provider.dart';
@@ -71,27 +72,32 @@ class _StoryAppState extends State<StoryApp> {
         ),
       ],
       child: ChangeNotifierProvider<LocalizationProvider>(
-        create: (context) => LocalizationProvider(),
+        create: (context) => LocalizationProvider(PreferenceSettings()),
         builder: (context, child) {
           final provider = Provider.of<LocalizationProvider>(context);
-          return MaterialApp(
-            title: 'Dicoding Moments',
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('id', ''),
-              Locale('en', ''),
-            ],
-            locale: provider.locale,
-            home: Router(
-              routerDelegate: myRouterDelegate,
-              backButtonDispatcher: RootBackButtonDispatcher(),
-            ),
-          );
+          return FutureBuilder<Locale>(
+              future: provider.locale,
+              builder: (BuildContext context, AsyncSnapshot<Locale> snapshot) {
+                Locale? localInit = snapshot.data;
+                return MaterialApp(
+                  title: 'Dicoding Moments',
+                  localizationsDelegates: const [
+                    AppLocalizations.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  supportedLocales: const [
+                    Locale('id', ''),
+                    Locale('en', ''),
+                  ],
+                  locale: localInit,
+                  home: Router(
+                    routerDelegate: myRouterDelegate,
+                    backButtonDispatcher: RootBackButtonDispatcher(),
+                  ),
+                );
+              });
         },
       ),
     );
